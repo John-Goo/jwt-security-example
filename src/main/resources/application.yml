@@ -1,0 +1,20 @@
+server:
+  port: 8080
+
+management:
+  security:
+    enabled: true
+
+
+spring:
+  servlet:
+    multipart:
+      enabled: true #开启文件上传
+      max-file-size: 500MB
+      max-request-size: 500MB
+
+minio:
+  endpoint: http://192.168.0.10:9000 #Minio服务所在地址
+  bucketName: demo #存储桶名称
+  accessKey: admin #访问的key
+  secretKey: 12345678 #访问的秘钥
