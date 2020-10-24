@@ -10,8 +10,7 @@ import com.techprimers.security.jwtsecurity.model.JwtUser;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.UUID;
 
 /**
@@ -55,6 +54,14 @@ public class FileUtil {
             buff.append(fileType.toString().toLowerCase());
         }
         return buff.toString();
+    }
+
+    // outputStream转inputStream
+    public ByteArrayInputStream parse(final OutputStream out) throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        baos = (ByteArrayOutputStream) out;
+        final ByteArrayInputStream swapStream = new ByteArrayInputStream(baos.toByteArray());
+        return swapStream;
     }
     public static String extractFileName(String filePath){
         if(filePath ==null){

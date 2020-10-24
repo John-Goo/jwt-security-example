@@ -25,10 +25,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.io.*;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.*;
 
@@ -101,14 +99,18 @@ public class MinioController {
         List<String> orgfileNameList = new ArrayList<>(file.length);
         for (MultipartFile multipartFile : file) {
             String orgfileName = multipartFile.getOriginalFilename();
-            orgfileName = prefixPath + orgfileName;
-            orgfileNameList.add(BUCKETNAME+"/"+orgfileName);
+            String storeObj = prefixPath + orgfileName;
+            String fileType = multipartFile.getContentType();
+            String filePath = storeObj+"&fileType="+fileType;
+            System.out.println(">>>>>文件类型："+fileType);
+            String accessPath = "http://localhost:8080/view/demo?p="+filePath;
+            orgfileNameList.add(accessPath);
             InputStream in = null;
             try {
                 in = multipartFile.getInputStream();
-                minioClient.putObject(BUCKETNAME, orgfileName, in, new PutObjectOptions(in.available(), -1));
+                minioClient.putObject(BUCKETNAME, storeObj, in, new PutObjectOptions(in.available(), -1));
             } catch (Exception e) {
-                LOGGER.error(e.getMessage());
+                LOGGER.error("{}-->",e);
                 res.setMessage("上传失败");
                 return res;
             }finally {
@@ -245,7 +247,10 @@ public class MinioController {
             filePath = fileDir +name;
             //String orgfileName = prefixPath + new Date().getTime()+".png";
             try {
-                minioClient.putObject(orgType, filePath, in, new PutObjectOptions(in.available(), -1));
+                ByteArrayInputStream bis = null;
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                minioClient.putObject(orgType, filePath, bis, new PutObjectOptions(bis.available(), -1));
+
             } catch (Exception e) {
                 LOGGER.error(e.getMessage());
                 res.setMessage("上传失败");
@@ -272,11 +277,13 @@ public class MinioController {
     }
 
 
-    @RequestMapping("/file/{bucketName}/public")
-    public void download(HttpServletResponse response, HttpServletRequest request,
-                         @PathVariable("bucketName") String bucketName)  {
+    @RequestMapping("/view1/{bucketName}")
+    public void view(HttpServletResponse response, HttpServletRequest request,
+                     @PathVariable("bucketName") String bucketName)  {
         String token = request.getParameter("token");
         String filePath= request.getParameter("p");
+        String fileType= request.getParameter("fileType");
+        LOGGER.info(" ========>     执行了"+filePath+",time:"+new Date().getTime());
         MinioClient minioClient = null;
         try {
             minioClient = new MinioClient(ENDPOINT, ACCESSKEY, SECRETKEY);
@@ -287,14 +294,71 @@ public class MinioController {
         }
         InputStream in = null;
         try {
-            ObjectStat stat = minioClient.statObject(bucketName, filePath);
-            response.setContentType(stat.contentType());
+            // ObjectStat stat = minioClient.statObject(bucketName, filePath);
+            response.setContentType(fileType);
+            String fileName=FileUtil.extractFileName(filePath);
+            // response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
+            in = minioClient.getObject(bucketName, filePath);
+            byte[] data = new byte[in.available()];
+            in.read(data);
+            String diskfilename = "final.mp4";
+            response.setContentType("video/mp4");
+           // response.setHeader("Content-Disposition", "attachment; filename=\"" + diskfilename + "\"");
+           // System.out.println("data.length " + data.length);
+            response.setContentLength(data.length);
+            response.setHeader("Content-Range", "" + Integer.valueOf(data.length - 1));
+            response.setHeader("Accept-Ranges", "bytes");
+            response.setHeader("Etag", "W/\"9767057-1323779115364\"");
+            OutputStream os = response.getOutputStream();
+            os.write(data);
+            //先声明的流后关掉！
+            os.flush();
+            os.close();
+            in.close();
+        } catch (Exception e) {
+            LOGGER.error("下载发生了异常！",e);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    LOGGER.error(e.getMessage());
+                }
+            }
+        }
+    }
+
+
+    @GetMapping("/view/{bucketName}")
+    public void viewq(HttpServletResponse response, HttpServletRequest request,
+                     @PathVariable("bucketName") String bucketName) throws FileNotFoundException {
+        String token = request.getParameter("token");
+        String filePath= request.getParameter("p");
+        String fileType= request.getParameter("fileType");
+        LOGGER.info(" ========>     执行了"+filePath+",time:"+new Date().getTime());
+
+
+
+        MinioClient minioClient = null;
+        try {
+            minioClient = new MinioClient(ENDPOINT, ACCESSKEY, SECRETKEY);
+        } catch (InvalidEndpointException e) {
+            e.printStackTrace();
+        } catch (InvalidPortException e) {
+            e.printStackTrace();
+        }
+        InputStream in = null;
+        try {
+            // ObjectStat stat = minioClient.statObject(bucketName, filePath);
+            response.setContentType(fileType);
             String fileName=FileUtil.extractFileName(filePath);
             response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
+             //in = new FileInputStream(new File("F:\\training-video\\Lambda\\test\\MyVideo_1.mp4"));
             in = minioClient.getObject(bucketName, filePath);
+            LOGGER.info(" >>>本次下载文件大小："+in.available());
             IOUtils.copy(in, response.getOutputStream());
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error("下载发生了异常！",e);
         } finally {
             if (in != null) {
                 try {
@@ -313,5 +377,12 @@ public class MinioController {
             jwtUser.setRole("admin");
             jwtUser.setUserName("谷海江");
             FileUtil.print(response,jwtUser);
+    }
+
+    public static void main(String[] args) throws UnsupportedEncodingException {
+        String str = URLEncoder.encode("f1/f2/MyVideo_1.mp4&fileType=video/mp4", "UTF-8");
+        System.out.println(str);
+        String deStr = URLDecoder.decode(str,"UTF-8");
+        System.out.println(deStr);
     }
 }
