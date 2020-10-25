@@ -387,9 +387,10 @@ public class MinioController {
         System.out.println(">>>> 发送参数："+student);
         WResult<Person>  wResult = WSyncDataHelper.builder()
                 .setEntity(student)
-                .post("http://localhost:8081/recv")
+                .post()
                 .execute(Person.class);
         System.out.println(" >>>> 返回结果："+wResult);
+        //http://localhost:8081/recv
         return wResult;
     }
 

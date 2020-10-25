@@ -8,6 +8,7 @@ package com.techprimers.security.jwtsecurity.util;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Charsets;
+import com.techprimers.security.jwtsecurity.config.WSyncDataConfigAbstract;
 import com.techprimers.security.jwtsecurity.controller.WResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
@@ -37,7 +38,14 @@ import java.util.Map;
  * @date: 2020/10/21 20:30
  */
 @Slf4j
-public class WSyncDataHelper {
+public  class WSyncDataHelper {
+
+    private static WSyncDataConfigAbstract wConfig;
+
+    public static void setWConfig(WSyncDataConfigAbstract wConfig1){
+        wConfig = wConfig1;
+    }
+
     public static HttpBuilder builder() {
         return new HttpBuilder();
     }
@@ -71,7 +79,9 @@ public class WSyncDataHelper {
         }
 
         public HttpBuilder post() {
-            return post(null);
+            log.info(" ==== 公域url："+wConfig.pdUrl());
+            log.info(" ==== 令牌token："+wConfig.token());
+            return post(wConfig.pdUrl());
         }
 
         public HttpBuilder post(String url) {
