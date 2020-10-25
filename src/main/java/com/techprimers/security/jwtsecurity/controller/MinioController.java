@@ -68,7 +68,7 @@ public class MinioController {
             InputStream object = minioClient.getObject(BUCKETNAME, filename);
             byte buf[] = new byte[1024];
             int length = 0;
-            httpResponse.reset();
+           // httpResponse.reset();
             httpResponse.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, "UTF-8"));
             httpResponse.setContentType("application/octet-stream");
             httpResponse.setCharacterEncoding("utf-8");
