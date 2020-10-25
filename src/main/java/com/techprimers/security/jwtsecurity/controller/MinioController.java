@@ -8,7 +8,10 @@ package com.techprimers.security.jwtsecurity.controller;
 import com.alibaba.fastjson.JSON;
 import com.techprimers.security.jwtsecurity.model.JwtUser;
 import com.techprimers.security.jwtsecurity.util.FileUtil;
+import com.techprimers.security.jwtsecurity.util.WSyncDataHelper;
+import com.techprimers.security.jwtsecurity.vo.Person;
 import com.techprimers.security.jwtsecurity.vo.Res;
+import com.techprimers.security.jwtsecurity.vo.Student;
 import io.minio.MinioClient;
 import io.minio.ObjectStat;
 import io.minio.PutObjectOptions;
@@ -378,6 +381,20 @@ public class MinioController {
             jwtUser.setUserName("谷海江");
             FileUtil.print(response,jwtUser);
     }
+
+    @PostMapping("/sync")
+    public WResult<Person> sync(@RequestBody Student student){
+        System.out.println(">>>> 发送参数："+student);
+        WResult<Person>  wResult = WSyncDataHelper.builder()
+                .setEntity(student)
+                .post("http://localhost:8081/recv")
+                .execute(Person.class);
+        System.out.println(" >>>> 返回结果："+wResult);
+        return wResult;
+    }
+
+
+
 
     public static void main(String[] args) throws UnsupportedEncodingException {
         String str = URLEncoder.encode("f1/f2/MyVideo_1.mp4&fileType=video/mp4", "UTF-8");
