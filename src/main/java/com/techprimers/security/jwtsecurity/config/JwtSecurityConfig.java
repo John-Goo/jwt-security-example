@@ -24,6 +24,8 @@ import java.util.Collections;
 public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
+
+
     @Autowired
     private JwtAuthenticationProvider authenticationProvider;
     @Autowired
@@ -31,6 +33,7 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public AuthenticationManager authenticationManager() {
+
         return new ProviderManager(Collections.singletonList(authenticationProvider));
     }
 

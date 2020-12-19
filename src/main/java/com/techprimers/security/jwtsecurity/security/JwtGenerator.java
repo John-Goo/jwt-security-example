@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtGenerator {
 
+    public static String _JWT_KEY="FF-SINY-2000303KFAF-YY";
+
 
     public String generate(JwtUser jwtUser) {
 
@@ -21,7 +23,7 @@ public class JwtGenerator {
 
         return Jwts.builder()
                 .setClaims(claims)
-                .signWith(SignatureAlgorithm.HS512, "youtube")
+                .signWith(SignatureAlgorithm.HS512, _JWT_KEY)
                 .compact();
     }
 }

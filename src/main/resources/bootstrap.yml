@@ -1,0 +1,19 @@
+#Spring
+spring:
+  application:
+    name: file-provider
+  cloud:
+    nacos:
+      config:
+        server-addr: nacos.wit2cloud.com:8848
+        file-extension: yaml
+
+      discovery:
+        server-addr:  nacos.wit2cloud.com:8848
+
+
+  #profile
+  profiles:
+    active: dev,store
+
+

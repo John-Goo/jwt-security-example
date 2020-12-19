@@ -1,8 +1,6 @@
 package com.techprimers.security.jwtsecurity.controller;
 
-import lombok.Data;
 
-@Data
 public class WResult<T> implements Cloneable{
 
 
@@ -49,4 +47,28 @@ public class WResult<T> implements Cloneable{
     }
 
     protected final static WResult prototype = new WResult();
+
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
+    }
 }

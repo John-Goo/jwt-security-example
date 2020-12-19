@@ -82,13 +82,19 @@ public class MD5Util {
     }
     public static void main(String[] args) {
         // 加密+加盐
-        String password1 = md5HexWithSalt("admin");
-        System.out.println("结果：" + password1 + "   长度："+ password1.length());
+       // String password1 = md5HexWithSalt("admin");
+       // System.out.println("结果：" + password1 + "   长度："+ password1.length());
         // 解码
-        System.out.println("============================");
-        String[] destStr = extractSalt(password1);
-        System.out.println("{salt}-->"+destStr[1]);
-        System.out.println("{md5str}-->"+destStr[0]);
+       // System.out.println("============================");
+        //String[] destStr = extractSalt(password1);
+       // System.out.println("{salt}-->"+destStr[1]);
+       // System.out.println("{md5str}-->"+destStr[0]);
+        // wljiam
+        String str = md5Hex("Abc");
+       // String key = "w"+str.substring(1,27)+"ljiam";
+        System.out.println(str);
+
+
 
     }
 }

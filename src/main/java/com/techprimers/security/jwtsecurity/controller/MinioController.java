@@ -8,12 +8,8 @@ package com.techprimers.security.jwtsecurity.controller;
 import com.alibaba.fastjson.JSON;
 import com.techprimers.security.jwtsecurity.model.JwtUser;
 import com.techprimers.security.jwtsecurity.util.FileUtil;
-import com.techprimers.security.jwtsecurity.util.WSyncDataHelper;
-import com.techprimers.security.jwtsecurity.vo.Person;
 import com.techprimers.security.jwtsecurity.vo.Res;
-import com.techprimers.security.jwtsecurity.vo.Student;
 import io.minio.MinioClient;
-import io.minio.ObjectStat;
 import io.minio.PutObjectOptions;
 import io.minio.errors.InvalidEndpointException;
 import io.minio.errors.InvalidPortException;
@@ -52,10 +48,20 @@ public class MinioController {
     private  String ACCESSKEY;
     @Value("${minio.secretKey}")
     private  String SECRETKEY;
+    @Value("${wit2cloud.url}")
+    private String wit2cloudUrl;
 
 
 
 
+
+    @RequestMapping(value = "/queryInfo", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    public WResult queryInfo(@RequestBody StudentRequBo requestBo) {
+        System.out.println("接收到参数===>"+requestBo);
+        WResult result = new WResult();
+        result.setData(requestBo);
+        return result;
+    }
 
 
 
@@ -68,7 +74,7 @@ public class MinioController {
             InputStream object = minioClient.getObject(BUCKETNAME, filename);
             byte buf[] = new byte[1024];
             int length = 0;
-           // httpResponse.reset();
+            httpResponse.reset();
             httpResponse.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, "UTF-8"));
             httpResponse.setContentType("application/octet-stream");
             httpResponse.setCharacterEncoding("utf-8");
@@ -381,21 +387,6 @@ public class MinioController {
             jwtUser.setUserName("谷海江");
             FileUtil.print(response,jwtUser);
     }
-
-    @PostMapping("/sync")
-    public WResult<Person> sync(@RequestBody Student student){
-        System.out.println(">>>> 发送参数："+student);
-        WResult<Person>  wResult = WSyncDataHelper.builder()
-                .setEntity(student)
-                .post()
-                .execute(Person.class);
-        System.out.println(" >>>> 返回结果："+wResult);
-        //http://localhost:8081/recv
-        return wResult;
-    }
-
-
-
 
     public static void main(String[] args) throws UnsupportedEncodingException {
         String str = URLEncoder.encode("f1/f2/MyVideo_1.mp4&fileType=video/mp4", "UTF-8");

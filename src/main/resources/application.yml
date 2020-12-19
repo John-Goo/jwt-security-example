@@ -6,15 +6,30 @@ management:
     enabled: true
 
 
-spring:
-  servlet:
-    multipart:
-      enabled: true #开启文件上传
-      max-file-size: 500MB
-      max-request-size: 500MB
+
+
 
 minio:
   endpoint: http://192.168.0.10:9000 #Minio服务所在地址
   bucketName: demo #存储桶名称
   accessKey: admin #访问的key
   secretKey: 12345678 #访问的秘钥
+#jasypt
+jasypt:
+  encryptor:
+    password: 7T0sU6q%XY$Al39LP4BJUgwd$hGy*Fk81
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://192.168.0.93:3306/emr-cdss-extract?useUnicode=true&characterEncoding=utf-8&useTimezone=true&serverTimezone=GMT%2B8
+    username: root
+    password: 123456
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      pool-name: DatebookHikariCP
+  servlet:
+    multipart:
+      enabled: true #开启文件上传
+      max-file-size: 500MB
+      max-request-size: 500MB
