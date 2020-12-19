@@ -21,9 +21,9 @@ import org.springframework.context.annotation.Configuration;
 @Data
 public class WSyncDataConfig extends WSyncDataConfigAbstract{
 
-    @Value("${sync.pdUrl}")
+   // @Value("${sync.pdUrl}")
     private String pdUrl;
-    @Value("${sync.token}")
+    //@Value("${sync.token}")
     private String token;
 
     @Override
